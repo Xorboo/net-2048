@@ -35,6 +35,7 @@ class Program
                     .Configure<GameConfiguration>(context.Configuration.GetSection("GameConfiguration"))
                     .AddSingleton<IGameManager, GameManager>()
                     .AddSingleton<IInputManager, InputManager>()
+                    .AddSingleton<IInputHandler, ConsoleInputHandler>()
                     .AddSingleton<IUserDataStorage, UserDataStorage>()
                     .AddTransient<IRoundManager, RoundManager>()
                     .AddTransient<ITileSpawner, TileSpawner>()

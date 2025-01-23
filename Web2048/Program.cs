@@ -34,11 +34,12 @@ builder.Services
     .AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) })
     .AddSingleton<IGameManager, GameManager>()
     .AddSingleton<IInputManager, InputManager>()
+    .AddSingleton<IInputHandler, WebInputHandler>()
     .AddSingleton<IUserDataStorage, TempUserDataStorage>()
     .AddTransient<IRoundManager, RoundManager>()
     .AddTransient<ITileSpawner, TileSpawner>()
     .AddTransient<IMerger, Merger>()
-    .AddSingleton<IRenderer, Renderer>()
+    .AddSingleton<IRenderer, WebRenderer>()
     .AddSingleton<IConsoleWrapper, ConsoleRedirection>();
 
 await builder.Build().RunAsync();

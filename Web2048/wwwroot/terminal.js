@@ -11,7 +11,13 @@ function setupTerminal() {
             windowOption: {
                 fillScreenResize: true
             },
-            fontSize: 20
+            fontSize: 20,
+            cursorInactiveStyle: "none",
+            cursorStyle: "bar",
+            cursorWidth: 1,
+            theme: {
+                cursor: "black"
+            }
         });
         term.open(terminalElement);
     } else {
@@ -22,7 +28,7 @@ function setupTerminal() {
 setupTerminal();
 
 function getAnsiColor(consoleColor) {
-    switch(consoleColor) {
+    switch (consoleColor) {
         case 0:  // Black
             return '\x1b[30m';
         case 1:  // DarkBlue
@@ -55,8 +61,8 @@ function getAnsiColor(consoleColor) {
             return '\x1b[93m';
         case 15: // White
             return '\x1b[97m';
-        default:
-            return '\x1b[0m'; // Reset
+        default: // Reset
+            return '\x1b[0m';
     }
 }
 

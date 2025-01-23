@@ -9,13 +9,12 @@ public class InputManager: IInputManager
     private bool _isQuitPressed;
     private bool _isYesPressed;
     private bool _isNoPressed;
-    
-    
+
     private readonly ConcurrentQueue<ConsoleKey> _inputBuffer = new();
 
-    public InputManager()
+    public InputManager(IInputHandler inputHandler)
     {
-        Task.Run(TrackInput);
+        inputHandler.StartListening(key => _inputBuffer.Enqueue(key));
     }
     
     public void Tick()
@@ -108,14 +107,5 @@ public class InputManager: IInputManager
         }
 
         return null;
-    }
-
-    private void TrackInput()
-    {
-        while (true)
-        {
-            var key = Console.ReadKey(true);
-            _inputBuffer.Enqueue(key.Key);
-        }
     }
 }
