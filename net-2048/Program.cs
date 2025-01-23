@@ -8,7 +8,6 @@ using GameLogic.Render;
 using GameLogic.Round;
 using GameLogic.UserData;
 using Serilog;
-using Serilog.Events;
 
 namespace Net2048;
 
@@ -18,6 +17,7 @@ class Program
     {
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+            .AddJsonFile("gameSettings.json", optional: false, reloadOnChange: false)
             .Build();
 
         Log.Logger = new LoggerConfiguration()
@@ -39,7 +39,8 @@ class Program
                     .AddTransient<IRoundManager, RoundManager>()
                     .AddTransient<ITileSpawner, TileSpawner>()
                     .AddTransient<IMerger, Merger>()
-                    .AddSingleton<IRenderer, Renderer>();
+                    .AddSingleton<IRenderer, Renderer>()
+                    .AddSingleton<IConsoleWrapper, ConsoleWrapper>();
             })
             .UseSerilog() 
             .Build();

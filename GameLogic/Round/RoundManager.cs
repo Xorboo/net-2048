@@ -1,5 +1,6 @@
 ﻿using GameLogic.Configuration;
 using GameLogic.Input;
+using Microsoft.Extensions.Options;
 
 namespace GameLogic.Round;
 
@@ -16,7 +17,7 @@ public class RoundManager : IRoundManager
         ITileSpawner spawner,
         IInputManager inputManager,
         IMerger merger,
-        Microsoft.Extensions.Options.IOptions<GameConfiguration> settings)
+        IOptions<GameConfiguration> settings)
     {
         _spawner = spawner;
         _inputManager = inputManager;

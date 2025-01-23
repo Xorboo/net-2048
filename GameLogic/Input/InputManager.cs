@@ -88,6 +88,11 @@ public class InputManager: IInputManager
         return command;
     }
 
+    public void AddKey(ConsoleKey key)
+    {
+        _inputBuffer.Enqueue(key);
+    }
+
     private BoardCommand? ParseDirectionCommand(ConsoleKey key)
     {
         switch (key)

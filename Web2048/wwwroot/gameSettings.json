@@ -1,0 +1,13 @@
+﻿{
+  "GameConfiguration": {
+    "FrameRate": 15,
+    "BoardSize": 4,
+    "StartingTilesCount": 2,
+    "SpawnChances": [
+      80,
+      20
+    ],
+    "WinTileValue": 2048,
+    "SaveDataFile": "data.json"
+  }
+}

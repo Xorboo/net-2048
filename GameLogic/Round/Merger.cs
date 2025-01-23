@@ -1,5 +1,6 @@
 ﻿using GameLogic.Configuration;
 using GameLogic.Input;
+using Microsoft.Extensions.Options;
 
 namespace GameLogic.Round;
 
@@ -8,7 +9,7 @@ public class Merger: IMerger
     private readonly List<int> _rowStorage = new();
     private readonly int[,] _tempBoard;
 
-    public Merger(Microsoft.Extensions.Options.IOptions<GameConfiguration> settings)
+    public Merger(IOptions<GameConfiguration> settings)
     {
         int boardSize = settings.Value.BoardSize;
         _tempBoard = new int[boardSize, boardSize];

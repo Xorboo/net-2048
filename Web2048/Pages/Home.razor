@@ -1,0 +1,57 @@
+﻿@page "/"
+@using GameLogic
+@using GameLogic.Input
+@inject IJSRuntime JSRuntime
+@inject IGameManager GameManager
+@inject IInputManager InputManager
+
+<PageTitle>Home</PageTitle>
+
+<h1>2048</h1>
+<div id="terminal"></div>
+
+@code {
+    private IJSObjectReference _module;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Import the JavaScript module
+            _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./terminal.js");
+
+            // Call the setup method from the imported module
+            await _module.InvokeVoidAsync("setupTerminalKeyListener", 
+                DotNetObjectReference.Create(this));
+        }
+    }
+
+    [JSInvokable]
+    public void HandleKeyPress(int keyCode)
+    {
+        ConsoleKey consoleKey = ConvertKeyCode(keyCode);
+        InputManager.AddKey(consoleKey);
+    }
+
+    private ConsoleKey ConvertKeyCode(int keyCode)
+    {
+        return keyCode switch
+        {
+            87 => ConsoleKey.W,
+            65 => ConsoleKey.A,
+            83 => ConsoleKey.S,
+            68 => ConsoleKey.D,
+            81 => ConsoleKey.Q,
+            82 => ConsoleKey.R,
+            89 => ConsoleKey.Y,
+            78 => ConsoleKey.N,
+            _ => ConsoleKey.None
+        };
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await GameManager.RunAsync();
+    }
+}

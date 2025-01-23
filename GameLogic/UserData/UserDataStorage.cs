@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using GameLogic.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace GameLogic.UserData;
 
@@ -11,7 +12,7 @@ public class UserDataStorage: IUserDataStorage
 
     private UserData _userData = new();
     
-    public UserDataStorage(Microsoft.Extensions.Options.IOptions<GameConfiguration> settings, ILogger<GameManager> logger)
+    public UserDataStorage(IOptions<GameConfiguration> settings, ILogger<GameManager> logger)
     {
         _settings = settings.Value;
         _logger = logger;

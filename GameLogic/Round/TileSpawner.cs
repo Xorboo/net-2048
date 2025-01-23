@@ -1,5 +1,6 @@
 ﻿using GameLogic.Configuration;
 using GameLogic.Round.Utils;
+using Microsoft.Extensions.Options;
 
 namespace GameLogic.Round;
 
@@ -10,7 +11,7 @@ public class TileSpawner: ITileSpawner
     private readonly GameConfiguration _settings;
     private readonly WeightedRandom<int> _spawnChances;
 
-    public TileSpawner(Microsoft.Extensions.Options.IOptions<GameConfiguration> settings)
+    public TileSpawner(IOptions<GameConfiguration> settings)
     {
         _settings = settings.Value;
         var tileChances = _settings.SpawnChances

@@ -4,6 +4,7 @@ using GameLogic.Render;
 using GameLogic.Round;
 using GameLogic.State;
 using GameLogic.UserData;
+using Microsoft.Extensions.Options;
 
 namespace GameLogic;
 
@@ -23,7 +24,7 @@ public class GameManager: IGameManager
         IInputManager inputManager, 
         IRenderer renderer,
         IUserDataStorage userDataStorage,
-        Microsoft.Extensions.Options.IOptions<GameConfiguration> settings)
+        IOptions<GameConfiguration> settings)
     {
         _roundManager = roundManager;
         _inputManager = inputManager;
@@ -59,6 +60,34 @@ public class GameManager: IGameManager
             if (sleepTime > 0)
             {
                 Thread.Sleep((int)sleepTime);
+            }
+        }
+    }
+    
+    public async Task RunAsync()
+    {
+        float frameTime = 1000f / _settings.FrameRate;
+        
+        while (!_quitRequested)
+        {
+            long frameStartTime = Environment.TickCount64;
+            
+            _inputManager.Tick();
+
+            ProcessPromptInput();
+            
+            if (_gameState.ActivePrompt == ActivePrompt.None)
+            {
+                TickRound();
+            }
+            
+            _renderer.Render(_gameState, _roundManager.State);
+            
+            long frameEndTime = Environment.TickCount64;
+            float sleepTime = frameTime - (frameEndTime - frameStartTime);
+            if (sleepTime > 0)
+            {
+                await Task.Delay((int)sleepTime);
             }
         }
     }

@@ -7,4 +7,5 @@ public interface IInputManager: ITickable
     bool IsYesPressed();
     bool IsNoPressed();
     BoardCommand GetNextCommand();
+    void AddKey(ConsoleKey key);
 }

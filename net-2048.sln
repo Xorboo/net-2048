@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameLogic", "GameLogic\Game
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{1E609985-39CC-4124-A3E7-F29DEBB664C1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web2048", "Web2048\Web2048.csproj", "{791E7F18-23AB-4092-8A9E-42CEDE8DA014}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{1E609985-39CC-4124-A3E7-F29DEBB664C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E609985-39CC-4124-A3E7-F29DEBB664C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E609985-39CC-4124-A3E7-F29DEBB664C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{791E7F18-23AB-4092-8A9E-42CEDE8DA014}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{791E7F18-23AB-4092-8A9E-42CEDE8DA014}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{791E7F18-23AB-4092-8A9E-42CEDE8DA014}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{791E7F18-23AB-4092-8A9E-42CEDE8DA014}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

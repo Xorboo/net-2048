@@ -2,6 +2,7 @@
 using GameLogic.Input;
 using GameLogic.Round;
 using GameLogic.State;
+using Microsoft.Extensions.Options;
 
 namespace GameLogic.Render;
 
@@ -45,11 +46,13 @@ public class Renderer: IRenderer
 
     private ActivePrompt _lastActivePrompt = ActivePrompt.None;
 
+    private readonly IConsoleWrapper _consoleWrapper;
     private readonly GameConfiguration _settings;
     
     
-    public Renderer(Microsoft.Extensions.Options.IOptions<GameConfiguration> settings)
+    public Renderer(IConsoleWrapper consoleWrapper, IOptions<GameConfiguration> settings)
     {
+        _consoleWrapper = consoleWrapper;
         _settings = settings.Value;
         int n = _settings.BoardSize;
         string cellLine = new string('─', CellWidth);
@@ -57,16 +60,14 @@ public class Renderer: IRenderer
         _boardHorizontalSeparatorMid = "├" + string.Join("┼", Enumerable.Repeat(cellLine, n)) + "┤";
         _boardHorizontalSeparatorBot = "└" + string.Join("┴", Enumerable.Repeat(cellLine, n)) + "┘";
         
-        Console.OutputEncoding = System.Text.Encoding.UTF8;
-        Console.CursorVisible = false;
-        Console.Clear();
+        _consoleWrapper.Setup();
     }
 
     public void Render(GameState gameState, RoundState roundState)
     {
         if (_lastActivePrompt != gameState.ActivePrompt)
         {
-            Console.Clear();
+            _consoleWrapper.Clear();
         }
             
         RenderRoundState(roundState);
@@ -95,34 +96,29 @@ public class Renderer: IRenderer
         for (int y = 0; y < board.GetLength(0); y++)
         {
             SetPosition(_boardPosition.X, _boardPosition.Y + y * 2);
-            Console.Write(y == 0 ? _boardHorizontalSeparatorTop : _boardHorizontalSeparatorMid);
+            _consoleWrapper.Write(y == 0 ? _boardHorizontalSeparatorTop : _boardHorizontalSeparatorMid);
 
-            Console.SetCursorPosition(_boardPosition.X, _boardPosition.Y + y * 2 + 1);
-            Console.Write("│");
+            _consoleWrapper.SetCursorPosition(_boardPosition.X, _boardPosition.Y + y * 2 + 1);
+            _consoleWrapper.Write("│");
             for (int x = 0; x < board.GetLength(1); x++)
             {
                 int value = board[y, x];
                 if (value == 0)
                 {
-                    Console.Write(_emptyCell);
+                    _consoleWrapper.Write(_emptyCell);
                 }
                 else
                 {
-                    if (!_numberColors.TryGetValue(value, out var color))
-                    {
-                        color = _fallbackNumberColor;
-                    }
-                    Console.ForegroundColor = color;
-                    Console.Write(value.ToString().PadLeft(CellWidth));
-                    Console.ResetColor();
+                    var color = _numberColors.GetValueOrDefault(value, _fallbackNumberColor);
+                    _consoleWrapper.Write(value.ToString().PadLeft(CellWidth), color);
                 }
                 
-                Console.Write("│");
+                _consoleWrapper.Write("│");
             }
         }
 
         SetPosition(_boardPosition.X, _boardPosition.Y + board.GetLength(0) * 2);
-        Console.Write(_boardHorizontalSeparatorBot);
+        _consoleWrapper.Write(_boardHorizontalSeparatorBot);
         
         
         if (lastTickCommand != null)
@@ -140,9 +136,7 @@ public class Renderer: IRenderer
         {
             if (_tickCommandFramesLeft > 0)
             {
-                Console.ForegroundColor = ConsoleColor.Cyan;
                 DrawShiftCommand();
-                Console.ResetColor();
                 _tickCommandFramesLeft--;
             }
             else
@@ -164,19 +158,19 @@ public class Renderer: IRenderer
             case BoardCommand.Up:
                 pos.Y -= 1;
                 SetPosition(pos);
-                Console.Write(new string(clear ? ' ' : '^', boardWidth));
+                _consoleWrapper.Write(new string(clear ? ' ' : '^', boardWidth), ConsoleColor.Cyan);
                 break;
             case BoardCommand.Down:
                 pos.Y += boardHeight;
                 SetPosition(pos);
-                Console.Write(new string(clear ? ' ' : 'V', boardWidth));
+                _consoleWrapper.Write(new string(clear ? ' ' : 'V', boardWidth), ConsoleColor.Cyan);
                 break;
             case BoardCommand.Left:
                 pos.X -= 1;
                 for (int y = 0; y < boardHeight; y++)
                 {
                     SetPosition(pos);
-                    Console.Write(clear ? ' ' : '<');
+                    _consoleWrapper.Write(clear ? " ": "<", ConsoleColor.Cyan);
                     pos.Y++;
                 }
                 break;
@@ -185,7 +179,7 @@ public class Renderer: IRenderer
                 for (int y = 0; y < boardHeight; y++)
                 {
                     SetPosition(pos);
-                    Console.Write(clear ? ' ' : '>');
+                    _consoleWrapper.Write(clear ? " " : ">", ConsoleColor.Cyan);
                     pos.Y++;
                 }
                 break;
@@ -195,7 +189,7 @@ public class Renderer: IRenderer
     private void DrawScore(int score, int lastTickScore)
     {
         SetPosition(_scorePosition);
-        Console.Write($"Score: {score}");
+        _consoleWrapper.Write($"Score: {score}");
 
         if (lastTickScore != 0)
         {
@@ -207,15 +201,13 @@ public class Renderer: IRenderer
         {
             if (_tickScoreFramesLeft > 0)
             {
-                Console.ForegroundColor = ConsoleColor.Magenta;
-                Console.Write($" (+{_tickScore})".PadRight(8));
-                Console.ResetColor();
+                _consoleWrapper.Write($" (+{_tickScore})".PadRight(8), ConsoleColor.Magenta);
                 _tickScoreFramesLeft--;
             }
             else
             {
                 _tickScore = 0;
-                Console.Write("".PadRight(8));
+                _consoleWrapper.Write("".PadRight(8));
             }
         }
     }
@@ -223,7 +215,7 @@ public class Renderer: IRenderer
     private void DrawHighScore(int highScore)
     {
         SetPosition(_hihScorePosition);
-        Console.Write($"HighScore: {highScore}".PadRight(20));
+        _consoleWrapper.Write($"HighScore: {highScore}".PadRight(20));
     }
 
     private void DrawPrompt(ActivePrompt prompt)
@@ -254,11 +246,11 @@ public class Renderer: IRenderer
         corner.Y -= 1;
         corner.X -= width / 2;
         SetPosition(corner.X, corner.Y);
-        Console.Write(top);
+        _consoleWrapper.Write(top);
         SetPosition(corner.X, corner.Y + 1);
-        Console.Write(center);
+        _consoleWrapper.Write(center);
         SetPosition(corner.X, corner.Y + 2);
-        Console.Write(bottom);
+        _consoleWrapper.Write(bottom);
     }
 
     private void SetPosition(Coordinate coordinate)
@@ -268,6 +260,6 @@ public class Renderer: IRenderer
 
     private void SetPosition(int x, int y)
     {
-        Console.SetCursorPosition(Math.Max(0, x), Math.Max(0, y));
+        _consoleWrapper.SetCursorPosition(Math.Max(0, x), Math.Max(0, y));
     }
 }
