@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace GameLogic.Render;
 
-public class Renderer: IRenderer
+public class Renderer : IRenderer
 {
     // UI settings can be moved to Config if needed
     private const int CellWidth = 4;
@@ -16,6 +16,7 @@ public class Renderer: IRenderer
     private readonly Coordinate _promptCenterPosition = new(12, 8);
 
     private readonly ConsoleColor _fallbackNumberColor = ConsoleColor.DarkGray;
+
     private readonly Dictionary<int, ConsoleColor> _numberColors = new()
     {
         { 2, ConsoleColor.DarkGray },
@@ -48,8 +49,8 @@ public class Renderer: IRenderer
 
     private readonly IConsoleWrapper _consoleWrapper;
     private readonly GameConfiguration _settings;
-    
-    
+
+
     public Renderer(IConsoleWrapper consoleWrapper, IOptions<GameConfiguration> settings)
     {
         _consoleWrapper = consoleWrapper;
@@ -59,7 +60,7 @@ public class Renderer: IRenderer
         _boardHorizontalSeparatorTop = "┌" + string.Join("┬", Enumerable.Repeat(cellLine, n)) + "┐";
         _boardHorizontalSeparatorMid = "├" + string.Join("┼", Enumerable.Repeat(cellLine, n)) + "┤";
         _boardHorizontalSeparatorBot = "└" + string.Join("┴", Enumerable.Repeat(cellLine, n)) + "┘";
-        
+
         _consoleWrapper.Setup();
     }
 
@@ -69,15 +70,28 @@ public class Renderer: IRenderer
         {
             _consoleWrapper.Clear();
         }
-            
+
         RenderRoundState(roundState);
         DrawGameState(gameState);
+    }
+
+    public void Clear()
+    {
+        _consoleWrapper.Clear();
+
+        _lastActivePrompt = ActivePrompt.None;
+        
+        _tickCommand = null;
+        _tickCommandFramesLeft = 0;
+        
+        _tickScore = 0;
+        _tickCommandFramesLeft = 0;
     }
 
     private void DrawGameState(GameState gameState)
     {
         DrawHighScore(gameState.HighScore);
-        
+
         _lastActivePrompt = gameState.ActivePrompt;
         if (_lastActivePrompt != ActivePrompt.None)
         {
@@ -112,22 +126,22 @@ public class Renderer: IRenderer
                     var color = _numberColors.GetValueOrDefault(value, _fallbackNumberColor);
                     _consoleWrapper.Write(value.ToString().PadLeft(CellWidth), color);
                 }
-                
+
                 _consoleWrapper.Write("│");
             }
         }
 
         SetPosition(_boardPosition.X, _boardPosition.Y + board.GetLength(0) * 2);
         _consoleWrapper.Write(_boardHorizontalSeparatorBot);
-        
-        
+
+
         if (lastTickCommand != null)
         {
             if (_tickCommand != null)
             {
                 DrawShiftCommand(true);
             }
-            
+
             _tickCommand = lastTickCommand;
             _tickCommandFramesLeft = ShiftAnimationDuration;
         }
@@ -152,7 +166,7 @@ public class Renderer: IRenderer
         var pos = _boardPosition;
         int boardWidth = _settings.BoardSize * (CellWidth + 1) + 1;
         int boardHeight = _settings.BoardSize * 2 + 1;
-        
+
         switch (_tickCommand)
         {
             case BoardCommand.Up:
@@ -170,9 +184,10 @@ public class Renderer: IRenderer
                 for (int y = 0; y < boardHeight; y++)
                 {
                     SetPosition(pos);
-                    _consoleWrapper.Write(clear ? " ": "<", ConsoleColor.Cyan);
+                    _consoleWrapper.Write(clear ? " " : "<", ConsoleColor.Cyan);
                     pos.Y++;
                 }
+
                 break;
             case BoardCommand.Right:
                 pos.X += boardWidth;
@@ -182,6 +197,7 @@ public class Renderer: IRenderer
                     _consoleWrapper.Write(clear ? " " : ">", ConsoleColor.Cyan);
                     pos.Y++;
                 }
+
                 break;
         }
     }

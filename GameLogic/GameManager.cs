@@ -147,6 +147,7 @@ public class GameManager: IGameManager
     private void Restart()
     {
         _roundManager.Restart();
+        _renderer.Clear();
     }
 
     private void TickRound()

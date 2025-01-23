@@ -40,6 +40,6 @@ builder.Services
     .AddTransient<ITileSpawner, TileSpawner>()
     .AddTransient<IMerger, Merger>()
     .AddSingleton<IRenderer, WebRenderer>()
-    .AddSingleton<IConsoleWrapper, ConsoleRedirection>();
+    .AddSingleton<IConsoleWrapper, WebConsoleWrapper>();
 
 await builder.Build().RunAsync();

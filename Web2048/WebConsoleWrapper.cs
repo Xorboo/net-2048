@@ -3,11 +3,11 @@ using Microsoft.JSInterop;
 
 namespace Web2048;
 
-public class ConsoleRedirection: IConsoleWrapper
+public class WebConsoleWrapper: IConsoleWrapper
 {
     private readonly IJSRuntime _jsRuntime;
     
-    public ConsoleRedirection(IJSRuntime jsRuntime)
+    public WebConsoleWrapper(IJSRuntime jsRuntime)
     {
         _jsRuntime = jsRuntime;
     }
