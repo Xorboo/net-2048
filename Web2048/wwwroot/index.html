@@ -5,7 +5,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Web2048</title>
-    <base href="/net-2048/" />
+    <base href="/net-2048/" id="baseHref" />
+    <script>
+        if (window.location.hostname === 'localhost') {
+            // Local development environment, keep it as the root path
+            document.getElementById('baseHref').setAttribute('href', '/');
+        }
+    </script>
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
