@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "net-2048", "net-2048\net-20
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameLogic", "GameLogic\GameLogic.csproj", "{5B99E11E-475B-4E2A-A6D7-3F8B34E36C03}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{1E609985-39CC-4124-A3E7-F29DEBB664C1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{5B99E11E-475B-4E2A-A6D7-3F8B34E36C03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B99E11E-475B-4E2A-A6D7-3F8B34E36C03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B99E11E-475B-4E2A-A6D7-3F8B34E36C03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E609985-39CC-4124-A3E7-F29DEBB664C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E609985-39CC-4124-A3E7-F29DEBB664C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E609985-39CC-4124-A3E7-F29DEBB664C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E609985-39CC-4124-A3E7-F29DEBB664C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
