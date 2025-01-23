@@ -11,14 +11,12 @@
 <div id="terminal"></div>
 
 @code {
-    private IJSObjectReference _module;
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             // Import the JavaScript module
-            _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
+            var _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
                 "import", "./terminal.js");
 
             // Call the setup method from the imported module
