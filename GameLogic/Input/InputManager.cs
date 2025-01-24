@@ -65,14 +65,19 @@ public class InputManager: IInputManager
         return _isQuitPressed;
     }
 
-    public bool IsYesPressed()
+    public PromptResponse? GetPromptResponse()
     {
-        return _isYesPressed;
-    }
+        if (_isYesPressed)
+        {
+            return PromptResponse.Yes;
+        }
 
-    public bool IsNoPressed()
-    {
-        return _isNoPressed;
+        if (_isNoPressed)
+        {
+            return PromptResponse.No;
+        }
+
+        return null;
     }
 
     public BoardCommand GetNextCommand()

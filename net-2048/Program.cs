@@ -5,7 +5,6 @@ using GameLogic;
 using GameLogic.Configuration;
 using GameLogic.Input;
 using GameLogic.Render;
-using GameLogic.Round;
 using GameLogic.UserData;
 using Serilog;
 
@@ -33,14 +32,9 @@ class Program
             {
                 services
                     .Configure<GameConfiguration>(context.Configuration.GetSection("GameConfiguration"))
-                    .AddSingleton<IGameManager, GameManager>()
-                    .AddSingleton<IInputManager, InputManager>()
+                    .AddGameServices()
                     .AddSingleton<IInputHandler, ConsoleInputHandler>()
                     .AddSingleton<IUserDataStorage, UserDataStorage>()
-                    .AddTransient<IRoundManager, RoundManager>()
-                    .AddTransient<ITileSpawner, TileSpawner>()
-                    .AddTransient<IMerger, Merger>()
-                    .AddSingleton<IRenderer, Renderer>()
                     .AddSingleton<IConsoleWrapper, ConsoleWrapper>();
             })
             .UseSerilog() 

@@ -1,5 +1,6 @@
 ﻿using GameLogic.Configuration;
 using GameLogic.Input;
+using GameLogic.Prompts;
 using GameLogic.Render;
 using GameLogic.Round;
 using GameLogic.State;
@@ -14,6 +15,7 @@ public class GameManager: IGameManager
     private readonly IInputManager _inputManager;
     private readonly IRenderer _renderer;
     private readonly IUserDataStorage _userDataStorage;
+    private readonly IGamePromptHandler _promptHandler;
     
     private readonly GameConfiguration _settings;
     private readonly GameState _gameState = new();
@@ -24,12 +26,17 @@ public class GameManager: IGameManager
         IInputManager inputManager, 
         IRenderer renderer,
         IUserDataStorage userDataStorage,
+        IGamePromptHandler promptHandler,
         IOptions<GameConfiguration> settings)
     {
         _roundManager = roundManager;
         _inputManager = inputManager;
         _renderer = renderer;
         _userDataStorage = userDataStorage;
+        
+        _promptHandler = promptHandler;
+        _promptHandler.OnRestart += Restart;
+        _promptHandler.OnQuit += () => _quitRequested = true;
         
         _settings = settings.Value;
 
@@ -38,34 +45,16 @@ public class GameManager: IGameManager
     
     public void Run()
     {
-        float frameTime = 1000f / _settings.FrameRate;
-        
-        while (!_quitRequested)
-        {
-            long frameStartTime = Environment.TickCount64;
-            
-            _inputManager.Tick();
-
-            ProcessPromptInput();
-            
-            if (_gameState.ActivePrompt == ActivePrompt.None)
-            {
-                TickRound();
-            }
-            
-            _renderer.Render(_gameState, _roundManager.State);
-            
-            long frameEndTime = Environment.TickCount64;
-            float sleepTime = frameTime - (frameEndTime - frameStartTime);
-            if (sleepTime > 0)
-            {
-                Thread.Sleep((int)sleepTime);
-            }
-        }
+        RunInternal(async: false).GetAwaiter().GetResult();
     }
     
     public async Task RunAsync()
     {
+        await RunInternal(async: true);
+    }
+
+    private async Task RunInternal(bool async)
+    {
         float frameTime = 1000f / _settings.FrameRate;
         
         while (!_quitRequested)
@@ -74,7 +63,10 @@ public class GameManager: IGameManager
             
             _inputManager.Tick();
 
-            ProcessPromptInput();
+            if (_promptHandler.HandlePrompts(_gameState))
+            {
+                continue;
+            }
             
             if (_gameState.ActivePrompt == ActivePrompt.None)
             {
@@ -87,65 +79,21 @@ public class GameManager: IGameManager
             float sleepTime = frameTime - (frameEndTime - frameStartTime);
             if (sleepTime > 0)
             {
-                await Task.Delay((int)sleepTime);
+                if (async)
+                {
+                    await Task.Delay((int)sleepTime);
+                }
+                else
+                {
+                    Thread.Sleep((int)sleepTime);
+                }
             }
         }
     }
-
-    private void ProcessPromptInput()
-    {
-        if (_gameState.ActivePrompt == ActivePrompt.None)
-        {
-            if (_inputManager.IsRestartPressed())
-            {
-                _gameState.ActivePrompt = ActivePrompt.Restart;
-            }
-            
-            if (_inputManager.IsQuitPressed())
-            {
-                _gameState.ActivePrompt = ActivePrompt.Quit;
-            }
-        }
-
-        if (_gameState.ActivePrompt == ActivePrompt.None)
-        {
-            return;
-        }
-        
-        switch (_gameState.ActivePrompt) // ~Poor man's FSM~
-        {
-            case ActivePrompt.Restart:
-            case ActivePrompt.GameOverRestart:
-                // Allowing [No] on GameOverRestart to be able to see the final board state
-                if (_inputManager.IsNoPressed())
-                {
-                    _gameState.ActivePrompt = ActivePrompt.None;
-                }
-                    
-                if (_inputManager.IsYesPressed())
-                {
-                    _gameState.ActivePrompt = ActivePrompt.None;
-                    Restart();
-                }
-                break;
-            case ActivePrompt.Quit:
-                if (_inputManager.IsNoPressed())
-                {
-                    _gameState.ActivePrompt = ActivePrompt.None;
-                }
-
-                if (_inputManager.IsYesPressed())
-                {
-                    _quitRequested = true;
-                }
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
-
+    
     private void Restart()
     {
+        _gameState.ActivePrompt = ActivePrompt.None;
         _roundManager.Restart();
         _renderer.Clear();
     }
@@ -154,11 +102,17 @@ public class GameManager: IGameManager
     {
         bool wasGameOver = _roundManager.State.IsGameOver;
         _roundManager.Tick();
+        
         if (!wasGameOver && _roundManager.State.IsGameOver)
         {
             _gameState.ActivePrompt = ActivePrompt.GameOverRestart;
         }
 
+        UpdateHighScore();
+    }
+    
+    private void UpdateHighScore()
+    {
         if (_roundManager.State.Score > _gameState.HighScore)
         {
             _gameState.HighScore = _roundManager.State.Score;

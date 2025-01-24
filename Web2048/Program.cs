@@ -2,11 +2,9 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using GameLogic;
 using GameLogic.Configuration;
 using GameLogic.Input;
 using GameLogic.Render;
-using GameLogic.Round;
 using GameLogic.UserData;
 using Web2048;
 
@@ -32,14 +30,10 @@ builder.Logging
 builder.Services
     .Configure<GameConfiguration>(builder.Configuration.GetSection("GameConfiguration"))
     .AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) })
-    .AddSingleton<IGameManager, GameManager>()
-    .AddSingleton<IInputManager, InputManager>()
+    .AddGameServices()
+    .AddSingleton<IRenderer, WebRenderer>()
     .AddSingleton<IInputHandler, WebInputHandler>()
     .AddSingleton<IUserDataStorage, TempUserDataStorage>()
-    .AddTransient<IRoundManager, RoundManager>()
-    .AddTransient<ITileSpawner, TileSpawner>()
-    .AddTransient<IMerger, Merger>()
-    .AddSingleton<IRenderer, WebRenderer>()
     .AddSingleton<IConsoleWrapper, WebConsoleWrapper>();
 
 await builder.Build().RunAsync();

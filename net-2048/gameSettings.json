@@ -7,7 +7,7 @@
       80,
       20
     ],
-    "WinTileValue": 2048,
+    "WinTileValue": 32,
     "SaveDataFile": "data.json"
   }
 }
