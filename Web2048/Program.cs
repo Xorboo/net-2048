@@ -14,7 +14,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 var httpClient = new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };
 
-var appSettings = await httpClient.GetFromJsonAsync<Dictionary<string, object>>("appsettings.json");
+var appSettings = await httpClient.GetFromJsonAsync<Dictionary<string, object>>("appSettings.json");
 var gameSettings = await httpClient.GetFromJsonAsync<Dictionary<string, object>>("gameSettings.json");
 
 var configuration = new ConfigurationBuilder()
