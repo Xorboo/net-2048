@@ -133,3 +133,5 @@ Thumbs.db
 
 # Visual Studio Code
 .vscode/
+
+/net-2048/data.json
